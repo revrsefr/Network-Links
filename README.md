@@ -1,4 +1,4 @@
-# Network-Linkss IRC Services
+# Network-Links IRC Services
 
 ## END OF LIFE NOTICE: This project is no longer maintained. So long and thanks for all the fish.
 
@@ -15,7 +15,7 @@ Network-Links is an extensible, plugin-based IRC services framework written in P
 
 2) a versatile framework for developing IRC services.
 
-Network-Linkss is licensed under the Mozilla Public License, version 2.0 ([LICENSE.MPL2](LICENSE.MPL2)). The [corresponding documentation](docs/) is licensed under the Creative Attribution-ShareAlike 4.0 International License. ([LICENSE.CC-BY-SA-4.0](LICENSE.CC-BY-SA-4.0))
+Network-Links is licensed under the Mozilla Public License, version 2.0 ([LICENSE.MPL2](LICENSE.MPL2)). The [corresponding documentation](docs/) is licensed under the Creative Attribution-ShareAlike 4.0 International License. ([LICENSE.CC-BY-SA-4.0](LICENSE.CC-BY-SA-4.0))
 
 ## Getting help
 
