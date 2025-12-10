@@ -511,9 +511,13 @@ class InspIRCdProtocol(TS6BaseProtocol):
         f('CAPAB END')
 
         host = self.serverdata["hostname"]
-        f('SERVER {host} {Pass} 0 {sid} :{sdesc}'.format(host=host,
-          Pass=self.serverdata["sendpass"], sid=self.sid,
-          sdesc=self.serverdata.get('serverdesc') or conf.conf['pylink']['serverdesc']))
+        if self.proto_ver >= 1205:
+            server_line = 'SERVER {host} {Pass} {sid} :{sdesc}'
+        else:
+            server_line = 'SERVER {host} {Pass} 0 {sid} :{sdesc}'
+        f(server_line.format(host=host,
+            Pass=self.serverdata["sendpass"], sid=self.sid,
+            sdesc=self.serverdata.get('serverdesc') or conf.conf['pylink']['serverdesc']))
 
         self._send_with_prefix(self.sid, 'BURST %s' % ts)
 
@@ -865,7 +869,16 @@ class InspIRCdProtocol(TS6BaseProtocol):
         if self.uplink is None:
             # <- SERVER whatever.net abcdefgh 0 10X :some server description
             servername = args[0].lower()
-            source = args[3]
+            if self.proto_ver >= 1205:
+                try:
+                    source = args[2]
+                except IndexError:
+                    raise ProtocolError('Malformed SERVER introduction from uplink (missing SID)')
+            else:
+                try:
+                    source = args[3]
+                except IndexError:
+                    raise ProtocolError('Malformed SERVER introduction from uplink (missing SID)')
 
             if args[1] != self.serverdata['recvpass']:
                  # Check if recvpass is correct
