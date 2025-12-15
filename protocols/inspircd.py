@@ -54,6 +54,10 @@ class InspIRCdProtocol(TS6BaseProtocol):
         # Track the modules supported by the uplink.
         self._modsupport = set()
 
+        # Settable by plugins (e.g. relay) as needed, used to work around +j being triggered
+        # by bursting users.
+        self._endburst_delay = 0
+
     def _normalize_module_name(self, module):
         """Normalizes InspIRCd module names across protocol versions."""
         if not module:
@@ -78,10 +82,6 @@ class InspIRCdProtocol(TS6BaseProtocol):
 
     def _has_module(self, module):
         return self._normalize_module_name(module) in self._modsupport
-
-        # Settable by plugins (e.g. relay) as needed, used to work around +j being triggered
-        # by bursting users.
-        self._endburst_delay = 0
 
     ### Outgoing commands
 
