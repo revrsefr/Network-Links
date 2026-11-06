@@ -67,6 +67,11 @@ class RelayDataStore(structures.JSONDataStore):
             for key in cls._SET_KEYS:
                 if key in entry:
                     out[key] = sorted(entry[key])
+            # Safety net: JSON cannot store sets. The claim command used to store its networks as a
+            # set, which made every later save fail with "Object of type set is not JSON serializable".
+            for key, value in list(out.items()):
+                if isinstance(value, (set, frozenset)):
+                    out[key] = sorted(value)
             channels.append(out)
         return {'version': RELAY_DB_VERSION, 'channels': channels}
 
@@ -3001,10 +3006,11 @@ def claim(irc, source: str, args: list):
         irc.reply('Channel \x02%s\x02 is claimed by: %s' %
                 (channel, ', '.join(claimed) or '\x1D(none)\x1D'))
     else:
+        # Store a list, like relay creation does ('claim': [irc.name]); a set cannot be saved as JSON.
         if nets == '-' or not nets:
-            claimed = set()
+            claimed = []
         else:
-            claimed = set(nets.split(','))
+            claimed = sorted(set(nets.split(',')))
     db[relay]["claim"] = claimed
     irc.reply('CLAIM for channel \x02%s\x02 set to: %s' %
             (channel, ', '.join(claimed) or '\x1D(none)\x1D'))

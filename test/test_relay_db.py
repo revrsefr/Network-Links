@@ -67,6 +67,16 @@ class RelayCodecTest(unittest.TestCase):
         self.assertIn(('netB', '#chan'), entry['links'])
         self.assertIsInstance(entry['allowed_nets'], set)
 
+    def test_encode_handles_claim_stored_as_a_set(self):
+        # The relay "claim" command used to store its networks as a set, which json.dump rejects
+        # ("Object of type set is not JSON serializable") and killed the periodic save thread.
+        store = _sample_store()
+        store[('netA', '#chan')]['claim'] = {'netB', 'netA'}
+        enc = RelayDataStore._encode(store)
+        reparsed = json.loads(json.dumps(enc))  # must not raise
+        chan = [c for c in reparsed['channels'] if c['channel'] == '#chan'][0]
+        self.assertEqual(chan['claim'], ['netA', 'netB'])
+
     def test_decode_tolerates_missing_set_keys(self):
         data = {'version': 1, 'channels': [
             {'network': 'n', 'channel': '#c', 'links': [['n2', '#c']], 'creator': 'x'}
