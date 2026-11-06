@@ -449,9 +449,11 @@ class UnrealProtocol(TS6BaseProtocol):
         # NEXTBANS  - named/extended bans (stored verbatim as opaque masks)
         # TKLEXT2   - extended TKL format (we don't parse inbound TKL)
         # CLK       - cloaked-host key info; MLOCK - mode-lock propagation
-        f('PROTOCTL NOQUIT NICKv2 SJOIN SJ3 UMODE2 VL SID NICKIP ESVID EXTSWHOIS '
-          'MTAGS SJSBY NEXTBANS TKLEXT TKLEXT2 CLK MLOCK '
-          'EAUTH=%s SID=%s' % (host, self.sid))
+        # EAUTH must be the first token, and SID needs EAUTH before it. UnrealIRCd 6.2.7 closes the
+        # link with LINK_OLD_PROTOCOL ("unsupported protocol from UnrealIRCd 3.2.x") otherwise.
+        # https://www.unrealircd.org/docs/Server_protocol:PROTOCTL_command
+        f('PROTOCTL EAUTH=%s SID=%s NOQUIT NICKv2 SJOIN SJ3 UMODE2 VL NICKIP ESVID EXTSWHOIS '
+          'MTAGS SJSBY NEXTBANS TKLEXT TKLEXT2 CLK MLOCK' % (host, self.sid))
         sdesc = self.serverdata.get('serverdesc') or conf.conf['netlink']['serverdesc']
         f('SERVER %s 1 U%s-h6e-%s :%s' % (host, self.proto_ver, self.sid, sdesc))
 
